@@ -3,6 +3,7 @@ import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 
 import { StoreModule } from "@ngrx/store";
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 
 import { AppComponent } from "./app.component";
 import { HomeComponent } from "./home/home.component";
@@ -16,6 +17,7 @@ import { AppRoutingModule } from "./app-routing.module";
     FormsModule,
     ReactiveFormsModule,
     StoreModule.forRoot({}),
+    StoreDevtoolsModule.instrument(),
     AppRoutingModule,
   ],
   providers: [],
