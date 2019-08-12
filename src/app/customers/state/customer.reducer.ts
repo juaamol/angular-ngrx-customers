@@ -1,6 +1,8 @@
 import * as customerActions from "./customer.actions";
 import { createFeatureSelector, createSelector } from "@ngrx/store";
+
 import { EntityState, EntityAdapter, createEntityAdapter } from "@ngrx/entity";
+
 import { Customer } from "../customer.model";
 import * as fromRoot from "../../state/app-state";
 
@@ -25,26 +27,21 @@ export const defaultCustomer: CustomerState = {
   selectedCustomerId: null,
   loading: false,
   loaded: false,
-  error: "",
+  error: ""
 };
 
-export const initialState: CustomerState = customerAdapter.getInitialState(
-  defaultCustomer,
-);
+export const initialState = customerAdapter.getInitialState(defaultCustomer);
 
 export function customerReducer(
   state = initialState,
-  action: customerActions.Action,
+  action: customerActions.Action
 ): CustomerState {
   switch (action.type) {
-    case customerActions.CustomerActionTypes.LOAD_CUSTOMERS: {
-      return { ...state, loading: true };
-    }
     case customerActions.CustomerActionTypes.LOAD_CUSTOMERS_SUCCESS: {
       return customerAdapter.addAll(action.payload, {
         ...state,
         loading: false,
-        loaded: true,
+        loaded: true
       });
     }
     case customerActions.CustomerActionTypes.LOAD_CUSTOMERS_FAIL: {
@@ -53,7 +50,50 @@ export function customerReducer(
         entities: {},
         loading: false,
         loaded: false,
-        error: action.payload,
+        error: action.payload
+      };
+    }
+
+    case customerActions.CustomerActionTypes.LOAD_CUSTOMER_SUCCESS: {
+      return customerAdapter.addOne(action.payload, {
+        ...state,
+        selectedCustomerId: action.payload.id
+      });
+    }
+    case customerActions.CustomerActionTypes.LOAD_CUSTOMER_FAIL: {
+      return {
+        ...state,
+        error: action.payload
+      };
+    }
+
+    case customerActions.CustomerActionTypes.CREATE_CUSTOMER_SUCCESS: {
+      return customerAdapter.addOne(action.payload, state);
+    }
+    case customerActions.CustomerActionTypes.CREATE_CUSTOMER_FAIL: {
+      return {
+        ...state,
+        error: action.payload
+      };
+    }
+
+    case customerActions.CustomerActionTypes.UPDATE_CUSTOMER_SUCCESS: {
+      return customerAdapter.updateOne(action.payload, state);
+    }
+    case customerActions.CustomerActionTypes.UPDATE_CUSTOMER_FAIL: {
+      return {
+        ...state,
+        error: action.payload
+      };
+    }
+
+    case customerActions.CustomerActionTypes.DELETE_CUSTOMER_SUCCESS: {
+      return customerAdapter.removeOne(action.payload, state);
+    }
+    case customerActions.CustomerActionTypes.DELETE_CUSTOMER_FAIL: {
+      return {
+        ...state,
+        error: action.payload
       };
     }
 
@@ -64,24 +104,35 @@ export function customerReducer(
 }
 
 const getCustomerFeatureState = createFeatureSelector<CustomerState>(
-  "customers",
+  "customers"
 );
 
 export const getCustomers = createSelector(
   getCustomerFeatureState,
-  customerAdapter.getSelectors().selectAll,
+  customerAdapter.getSelectors().selectAll
 );
 
 export const getCustomersLoading = createSelector(
   getCustomerFeatureState,
-  (state: CustomerState) => state.loading,
+  (state: CustomerState) => state.loading
 );
+
 export const getCustomersLoaded = createSelector(
   getCustomerFeatureState,
-  (state: CustomerState) => state.loaded,
+  (state: CustomerState) => state.loaded
 );
 
 export const getError = createSelector(
   getCustomerFeatureState,
-  (state: CustomerState) => state.error,
+  (state: CustomerState) => state.error
+);
+
+export const getCurrentCustomerId = createSelector(
+  getCustomerFeatureState,
+  (state: CustomerState) => state.selectedCustomerId
+);
+export const getCurrentCustomer = createSelector(
+  getCustomerFeatureState,
+  getCurrentCustomerId,
+  state => state.entities[state.selectedCustomerId]
 );
