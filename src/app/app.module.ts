@@ -2,6 +2,8 @@ import { NgModule } from "@angular/core";
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserModule } from "@angular/platform-browser";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { StoreRouterConnectingModule, routerReducer, DefaultRouterStateSerializer, RouterStateSerializer} from '@ngrx/router-store';
+import { CustomSerializer } from './shared/utils';
 
 import { StoreModule } from "@ngrx/store";
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
@@ -18,13 +20,16 @@ import { AppRoutingModule } from "./app-routing.module";
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    StoreModule.forRoot({}),
+    StoreModule.forRoot({
+      router: routerReducer,
+    }),
+    StoreRouterConnectingModule.forRoot({stateKey: 'router'}),
     StoreDevtoolsModule.instrument(),
     EffectsModule.forRoot([]),
     HttpClientModule,
     AppRoutingModule,
   ],
-  providers: [],
+  providers: [{provide: RouterStateSerializer, useClass: CustomSerializer}],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
